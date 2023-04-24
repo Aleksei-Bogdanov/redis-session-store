@@ -1,0 +1,63 @@
+version: '3.9'
+
+services:
+  application:
+    container_name: redis-session-application
+    platform: linux/x86_64
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      POSTGRES_HOST: database
+    networks:
+      - db-network
+    restart: always
+    depends_on:
+      - database
+      - pgAdmin
+
+  database:
+    image: postgres:15.1-alpine
+    container_name: redis-session-database
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: redis-session-store_db
+      PGDATA: /data/postgres
+    volumes:
+      - database:/data/postgres
+    networks:
+      - db-network
+    ports:
+      - "5432:5432"
+    restart: always
+
+  pgAdmin:
+    container_name: redis-session-pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - pgAdmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - db-network
+    depends_on:
+      - database
+
+networks:
+  db-network:
+    driver: bridge
+  application_1:
+    driver: bridge
+
+volumes:
+  database:
+  pgAdmin:
+
+
+
+
