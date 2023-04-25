@@ -2,7 +2,6 @@ package com.company.api.controller;
 
 import com.company.api.dto.MessageDto;
 import com.company.api.dto.PersonDto;
-import com.company.persistance.entity.Message;
 import com.company.persistance.entity.Person;
 import com.company.service.MessageService;
 import com.company.service.PersonService;

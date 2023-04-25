@@ -34,14 +34,12 @@ class PersonControllerTest {
     private PersonService personService;
     private final String baseUrl = "/api/persons";
     private final String registrationUrl = "/registration";
-
     private final String jsonId = "$.id";
     private final String jsonUsername = "$.username";
     private final String jsonPassword = "$.password";
     private final String jsonPersonRole = "$.personRole";
     private final String jsonStatus = "$.status";
-    private final String methodSourcePath = "com.company.api.controller."
-            + "PersonControllerTest#";
+    private final String methodSourcePath = "com.company.api.controller.PersonControllerTest#";
 
     @Test
     @WithMockUser(roles = "ADMIN")
