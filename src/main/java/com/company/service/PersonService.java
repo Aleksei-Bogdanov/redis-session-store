@@ -24,13 +24,13 @@ public class PersonService implements ReactiveUserDetailsService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public Flux<PersonDto> findAll() {
-        return personRepository.findAll().map(personMapper::entityToDto);
+        return personRepository.findAll().flatMap(personMapper::map);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public Mono<PersonDto> createPerson(Mono<PersonDto> personDtoMono){
-        return  personDtoMono.map(personMapper::dtoToEntity)
+    public Mono<PersonDto> createPerson(PersonDto personDtoMono){
+        return  personMapper.map(personDtoMono)
                 .flatMap(personRepository::save)
-                .map(personMapper::entityToDto);
+                .flatMap(personMapper::map);
     }
 }

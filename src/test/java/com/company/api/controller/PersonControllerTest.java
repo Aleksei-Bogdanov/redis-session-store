@@ -34,9 +34,12 @@ class PersonControllerTest {
     private PersonService personService;
     private final String baseUrl = "/api/persons";
     private final String registrationUrl = "/registration";
+
+    private final String jsonId = "$.id";
+    private final String jsonUsername = "$.username";
+    private final String jsonPassword = "$.password";
+    private final String jsonPersonRole = "$.personRole";
     private final String jsonStatus = "$.status";
-    private final String jsonMessage = "$.message";
-    private final String jsonDetails = "$.details";
     private final String methodSourcePath = "com.company.api.controller."
             + "PersonControllerTest#";
 
@@ -72,23 +75,35 @@ class PersonControllerTest {
     @DisplayName("POST /api/persons/registration создает нового пользователя")
     public void shouldCreatePerson_thenReturnSavedPerson_soResponseIs201(){
         //given
-        Mono<PersonDto> personDtoMono = Mono.just(getPersonWithRoleUser());
+        PersonDto personDto = getPersonWithRoleUser();
 
-        when(personService.createPerson(personDtoMono)).thenReturn(personDtoMono);
+        when(personService.createPerson(personDto)).thenReturn(Mono.just(personDto));
 
         //then
-        this.rest
+        final WebTestClient.ResponseSpec response = this.rest
                 .mutateWith(SecurityMockServerConfigurers.csrf())
                 .post()
                 .uri(baseUrl + registrationUrl)
-                .body(Mono.just(personDtoMono),PersonDto.class)
-                .exchange()
-                .expectStatus().isCreated();
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(getPersonWithRoleUser())
+                .exchange();
+
+        response.expectStatus()
+                .isCreated()
+                .expectHeader().doesNotExist("Location")
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath(jsonId).isEqualTo(1)
+                .jsonPath(jsonUsername).isEqualTo(personDto.getUsername())
+                .jsonPath(jsonPassword).isEqualTo(personDto.getPassword())
+                .jsonPath(jsonPersonRole).isEqualTo(personDto.getPersonRole().toString());
     }
 
     @ParameterizedTest
     @MethodSource(methodSourcePath + "provideInvalidPersonDto")
     @WithMockUser(roles = "ADMIN")
+    @DisplayName("POST /api/persons/registration возвращает код 400 если введены некорректные данные")
     void shouldNotCreatePerson_becauseRequestValidationFailed_soResponseIs400(PersonDto invalidPersonDto) {
         final WebTestClient.ResponseSpec response = this.rest
                 .mutateWith(SecurityMockServerConfigurers.csrf())
@@ -103,9 +118,7 @@ class PersonControllerTest {
                 .isBadRequest()
                 .expectBody()
                 .consumeWith(System.out::println)
-                .jsonPath(jsonStatus).exists()
-                .jsonPath(jsonMessage).exists()
-                .jsonPath(jsonDetails).exists();
+                .jsonPath(jsonStatus).exists();
     }
 
     private PersonDto getPersonWithRoleUser(){

@@ -27,7 +27,7 @@ public class PersonController {
 
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<PersonDto> createPerson(@Valid @RequestBody Mono<PersonDto> personDtoMono) {
+    public Mono<PersonDto> createPerson(@Valid @RequestBody PersonDto personDtoMono) {
         return personService.createPerson(personDtoMono);
     }
 }

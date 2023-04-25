@@ -1,6 +1,7 @@
 package com.company.api.dto;
 
 import com.company.persistance.entity.PersonRole;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
