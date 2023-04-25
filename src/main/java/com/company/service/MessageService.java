@@ -1,5 +1,6 @@
 package com.company.service;
 
+import com.company.api.dto.MessageDto;
 import com.company.persistance.entity.Message;
 import com.company.persistance.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,15 +12,22 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class MessageService {
     private final MessageRepository messageRepository;
+    private final MessageMapper messageMapper;
 
-    public Flux<Message> list() {
-        return messageRepository.findAll();
-    }
-    public Flux<Message> list(long personId) {
-        return messageRepository.findByPersonId(personId);
+    public Flux<MessageDto> getMessages() {
+        return messageRepository.findAll()
+                .flatMap(messageMapper::map);
     }
 
-    public Mono<Message> addOne(Message message) {
-        return messageRepository.save(message);
+    public Flux<MessageDto> getMessagesByPersonId(long personId) {
+        return messageRepository.findByPersonId(personId)
+                .flatMap(messageMapper::map);
+    }
+
+    public Mono<MessageDto> createMessage(MessageDto messageDto) {
+        return messageMapper.map(messageDto)
+                .flatMap(messageRepository::save)
+                .flatMap(messageMapper::map);
+
     }
 }

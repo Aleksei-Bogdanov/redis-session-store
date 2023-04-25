@@ -27,9 +27,8 @@ public class PersonService implements ReactiveUserDetailsService {
         return personRepository.findAll().flatMap(personMapper::map);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public Mono<PersonDto> createPerson(PersonDto personDtoMono){
-        return  personMapper.map(personDtoMono)
+    public Mono<PersonDto> createPerson(PersonDto personDto){
+        return  personMapper.map(personDto)
                 .flatMap(personRepository::save)
                 .flatMap(personMapper::map);
     }

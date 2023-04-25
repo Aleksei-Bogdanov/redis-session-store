@@ -1,9 +1,14 @@
 package com.company.api.controller;
 
+import com.company.api.dto.MessageDto;
 import com.company.api.dto.PersonDto;
+import com.company.persistance.entity.Message;
+import com.company.persistance.entity.Person;
+import com.company.service.MessageService;
 import com.company.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import jakarta.validation.Valid;
@@ -20,14 +25,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class PersonController {
     private final PersonService personService;
 
+    private final MessageService messageService;
+
     @GetMapping
-    public Flux<PersonDto> getAll(){
+    public Flux<PersonDto> getPersons(){
         return personService.findAll();
     }
 
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<PersonDto> createPerson(@Valid @RequestBody PersonDto personDtoMono) {
-        return personService.createPerson(personDtoMono);
+    public Mono<PersonDto> createPerson(@Valid @RequestBody PersonDto personDto) {
+        return personService.createPerson(personDto);
+    }
+
+    @GetMapping("/messages")
+    public Flux<MessageDto> getMessages(@AuthenticationPrincipal Person person) {
+        return messageService.getMessagesByPersonId(person.getId());
+    }
+
+    @PostMapping("/messages")
+    public Mono<MessageDto> createMessage(
+            @AuthenticationPrincipal Person person,
+            @Valid @RequestBody MessageDto messageDto) {
+        messageDto.setPersonId(person.getId());
+        return messageService.createMessage(messageDto);
     }
 }
