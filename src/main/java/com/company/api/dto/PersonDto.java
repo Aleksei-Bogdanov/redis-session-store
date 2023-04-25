@@ -1,6 +1,8 @@
-package com.company.dto;
+package com.company.api.dto;
 
-import com.company.entity.PersonRole;
+import com.company.persistance.entity.PersonRole;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.EqualsAndHashCode;
@@ -14,8 +16,11 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class PersonDto {
     private long id;
+    @NotBlank
     private String username;
+    @NotBlank
     private String password;
+    @NotNull
     private PersonRole personRole;
 
     private boolean accountNonExpired;

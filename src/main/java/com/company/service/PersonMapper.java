@@ -1,7 +1,7 @@
-package com.company.mapper;
+package com.company.service;
 
-import com.company.dto.PersonDto;
-import com.company.entity.Person;
+import com.company.api.dto.PersonDto;
+import com.company.persistance.entity.Person;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;

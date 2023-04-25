@@ -1,10 +1,13 @@
-package com.company.controller;
+package com.company.api.controller;
 
-import com.company.dto.PersonDto;
-import com.company.entity.PersonRole;
+import com.company.api.dto.PersonDto;
+import com.company.persistance.entity.PersonRole;
 import com.company.service.PersonService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -18,6 +21,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.stream.Stream;
+
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -27,16 +32,20 @@ class PersonControllerTest {
     private WebTestClient rest;
     @MockBean
     private PersonService personService;
-
     private final String baseUrl = "/api/persons";
     private final String registrationUrl = "/registration";
+    private final String jsonStatus = "$.status";
+    private final String jsonMessage = "$.message";
+    private final String jsonDetails = "$.details";
+    private final String methodSourcePath = "com.company.api.controller."
+            + "PersonControllerTest#";
 
     @Test
     @WithMockUser(roles = "ADMIN")
     @DisplayName("GET /api/persons возвращает список всех пользователей")
     void shouldReturnAllPersons_soResponseIs200() {
-        PersonDto personDtoUser = getPersonUser();
-        PersonDto personDtoAdmin = getPersonAdmin();
+        PersonDto personDtoUser = getPersonWithRoleUser();
+        PersonDto personDtoAdmin = getPersonWithRoleAdmin();
 
         Flux<PersonDto> personDtoFlux = Flux.just(personDtoUser, personDtoAdmin);
 
@@ -63,12 +72,13 @@ class PersonControllerTest {
     @DisplayName("POST /api/persons/registration создает нового пользователя")
     public void shouldCreatePerson_thenReturnSavedPerson_soResponseIs201(){
         //given
-        Mono<PersonDto> personDtoMono = Mono.just(getPersonUser());
+        Mono<PersonDto> personDtoMono = Mono.just(getPersonWithRoleUser());
 
         when(personService.createPerson(personDtoMono)).thenReturn(personDtoMono);
 
         //then
-        this.rest.mutateWith(SecurityMockServerConfigurers.csrf())
+        this.rest
+                .mutateWith(SecurityMockServerConfigurers.csrf())
                 .post()
                 .uri(baseUrl + registrationUrl)
                 .body(Mono.just(personDtoMono),PersonDto.class)
@@ -76,7 +86,29 @@ class PersonControllerTest {
                 .expectStatus().isCreated();
     }
 
-    private PersonDto getPersonUser(){
+    @ParameterizedTest
+    @MethodSource(methodSourcePath + "provideInvalidPersonDto")
+    @WithMockUser(roles = "ADMIN")
+    void shouldNotCreatePerson_becauseRequestValidationFailed_soResponseIs400(PersonDto invalidPersonDto) {
+        final WebTestClient.ResponseSpec response = this.rest
+                .mutateWith(SecurityMockServerConfigurers.csrf())
+                .post()
+                .uri(baseUrl + registrationUrl)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(invalidPersonDto)
+                .exchange();
+
+        response.expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath(jsonStatus).exists()
+                .jsonPath(jsonMessage).exists()
+                .jsonPath(jsonDetails).exists();
+    }
+
+    private PersonDto getPersonWithRoleUser(){
         return new PersonDto(
                 1,
                 "Leo",
@@ -87,7 +119,7 @@ class PersonControllerTest {
                 true,
                 true);
     }
-    private PersonDto getPersonAdmin(){
+    private PersonDto getPersonWithRoleAdmin(){
         return new PersonDto(
                 2,
                 "Neo",
@@ -97,5 +129,13 @@ class PersonControllerTest {
                 true,
                 true,
                 true);
+    }
+
+    static Stream<Arguments> provideInvalidPersonDto() {
+        return Stream.of(
+                Arguments.of(new PersonDto(1, "", "password", PersonRole.ROLE_USER, true, true, true, true)),
+                Arguments.of(new PersonDto(1, "Leo", "", PersonRole.ROLE_USER, true, true, true, true)),
+                Arguments.of(new PersonDto(2, "Neo", "password", null, true, true, true, true))
+        );
     }
 }

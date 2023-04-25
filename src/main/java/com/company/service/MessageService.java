@@ -1,7 +1,7 @@
 package com.company.service;
 
-import com.company.entity.Message;
-import com.company.repository.MessageRepository;
+import com.company.persistance.entity.Message;
+import com.company.persistance.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;

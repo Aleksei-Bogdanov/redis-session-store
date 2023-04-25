@@ -1,7 +1,7 @@
-package com.company.controller;
+package com.company.api.controller;
 
-import com.company.entity.Message;
-import com.company.entity.Person;
+import com.company.persistance.entity.Message;
+import com.company.persistance.entity.Person;
 import com.company.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

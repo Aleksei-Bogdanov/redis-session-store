@@ -1,4 +1,4 @@
-package com.company.repository;
+package com.company.persistance.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
 

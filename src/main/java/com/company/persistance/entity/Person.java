@@ -1,4 +1,4 @@
-package com.company.entity;
+package com.company.persistance.entity;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,6 +1,6 @@
-package com.company.repository;
+package com.company.persistance.repository;
 
-import com.company.entity.Person;
+import com.company.persistance.entity.Person;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import reactor.core.publisher.Mono;
 

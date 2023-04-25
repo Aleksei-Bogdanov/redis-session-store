@@ -1,8 +1,7 @@
 package com.company.service;
 
-import com.company.dto.PersonDto;
-import com.company.repository.PersonRepository;
-import com.company.mapper.PersonMapper;
+import com.company.api.dto.PersonDto;
+import com.company.persistance.repository.PersonRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
