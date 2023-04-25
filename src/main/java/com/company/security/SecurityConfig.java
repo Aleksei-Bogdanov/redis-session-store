@@ -8,6 +8,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -23,7 +24,8 @@ public class SecurityConfig {
     public SecurityWebFilterChain filterChain(ServerHttpSecurity httpSecurity) {
 
         return httpSecurity
-                .csrf().disable()
+//                .csrf(csrf -> csrf.csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse()))
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .httpBasic().and()
                 .formLogin().and()
                 .authorizeExchange()

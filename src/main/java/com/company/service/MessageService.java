@@ -1,7 +1,6 @@
 package com.company.service;
 
-import com.company.domain.Message;
-import com.company.domain.Person;
+import com.company.entity.Message;
 import com.company.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

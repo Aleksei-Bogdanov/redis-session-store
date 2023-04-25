@@ -1,4 +1,4 @@
-package com.company.domain;
+package com.company.entity;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;

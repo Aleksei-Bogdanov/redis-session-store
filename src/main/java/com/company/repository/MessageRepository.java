@@ -1,6 +1,6 @@
 package com.company.repository;
 
-import com.company.domain.Message;
+import com.company.entity.Message;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import reactor.core.publisher.Flux;
 
