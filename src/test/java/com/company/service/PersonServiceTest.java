@@ -78,11 +78,7 @@ class PersonServiceTest {
                 1,
                 "Leo",
                 "password",
-                PersonRole.ROLE_USER,
-                true,
-                true,
-                true,
-                true);
+                PersonRole.ROLE_USER);
     }
 
     private PersonDto getPersonWithRoleAdmin(){
@@ -90,11 +86,7 @@ class PersonServiceTest {
                 2,
                 "Neo",
                 "password",
-                PersonRole.ROLE_ADMIN,
-                true,
-                true,
-                true,
-                true);
+                PersonRole.ROLE_ADMIN);
     }
 
 
