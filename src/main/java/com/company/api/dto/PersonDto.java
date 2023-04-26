@@ -23,12 +23,4 @@ public class PersonDto {
     private String password;
     @NotNull
     private PersonRole personRole;
-
-    private boolean accountNonExpired;
-
-    private boolean accountNonLocked;
-
-    private boolean credentialsNonExpired;
-
-    private boolean enabled;
 }

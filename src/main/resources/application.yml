@@ -8,3 +8,6 @@ spring:
     user: postgres
     password: password
     locations: db.migration
+  redis:
+    host: localhost
+    port: 6379
