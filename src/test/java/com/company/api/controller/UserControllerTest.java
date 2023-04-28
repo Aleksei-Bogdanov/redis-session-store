@@ -39,6 +39,11 @@ class UserControllerTest {
 
     private final String baseUrl = "/api/users";
     private final String registrationUrl = "/registration";
+    private static final long FIRST_ELEMENT_ID = 1;
+    private static final long SECOND_ELEMENT_ID = 2;
+    private static final String FIRST_USER_NAME = "TestName";
+    private static final String SECOND_USER_NAME = "TestName2";
+    private static final String PASSWORD = "TestPassword";
     private final String jsonId = "$.id";
     private final String jsonUsername = "$.username";
     private final String jsonUserRole = "$.userRole";
@@ -125,30 +130,30 @@ class UserControllerTest {
 
     private UserDto getUserWithRoleUser(){
         return new UserDto(
-                1,
-                "Leo",
-                "password",
+                FIRST_ELEMENT_ID,
+                FIRST_USER_NAME,
+                PASSWORD,
                 UserRole.ROLE_USER);
     }
 
     private PersonDto getPersonWithRoleUser(){
         return new PersonDto(
-                1,
-                "Leo",
+                FIRST_ELEMENT_ID,
+                FIRST_USER_NAME,
                 UserRole.ROLE_USER);
     }
     private PersonDto getPersonWithRoleAdmin(){
         return new PersonDto(
-                2,
-                "Neo",
+                SECOND_ELEMENT_ID,
+                SECOND_USER_NAME,
                 UserRole.ROLE_ADMIN);
     }
 
     static Stream<Arguments> provideInvalidPersonDto() {
         return Stream.of(
-                Arguments.of(new UserDto(1, "", "password", UserRole.ROLE_USER)),
-                Arguments.of(new UserDto(1, "Leo", "", UserRole.ROLE_USER)),
-                Arguments.of(new UserDto(2, "Neo", "password", null))
+                Arguments.of(new UserDto(FIRST_ELEMENT_ID, "", PASSWORD, UserRole.ROLE_USER)),
+                Arguments.of(new UserDto(FIRST_ELEMENT_ID, FIRST_USER_NAME, "", UserRole.ROLE_USER)),
+                Arguments.of(new UserDto(SECOND_ELEMENT_ID, SECOND_USER_NAME, PASSWORD, null))
         );
     }
 }
