@@ -1,5 +1,5 @@
 package com.company.persistance.entity;
 
-public enum PersonRole {
+public enum UserRole {
     ROLE_USER, ROLE_ADMIN
 }

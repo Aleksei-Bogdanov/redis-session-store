@@ -1,10 +1,6 @@
 package com.company.persistance.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -15,23 +11,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Getter
-@Setter
-@EqualsAndHashCode
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "tbl_persons")
-public class Person implements UserDetails {
+@Data
+@Table(name = "tbl_users")
+public class User implements UserDetails {
     @Id
     private long id;
     private String username;
     private String password;
-    @Column("person_role")
-    private PersonRole personRole;
+    @Column
+    private UserRole userRole;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(personRole.name()));
+        return List.of(new SimpleGrantedAuthority(userRole.name()));
     }
 
     @Override

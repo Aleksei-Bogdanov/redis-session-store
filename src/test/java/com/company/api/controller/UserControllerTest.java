@@ -1,8 +1,10 @@
 package com.company.api.controller;
 
 import com.company.api.dto.PersonDto;
-import com.company.persistance.entity.PersonRole;
-import com.company.service.PersonService;
+import com.company.api.dto.UserDto;
+import com.company.persistance.entity.UserRole;
+import com.company.service.MessageService;
+import com.company.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,33 +28,35 @@ import java.util.stream.Stream;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
-@WebFluxTest(PersonController.class)
-class PersonControllerTest {
+@WebFluxTest(UserController.class)
+class UserControllerTest {
     @Autowired
-    private WebTestClient rest;
+    private WebTestClient webTestClient;
     @MockBean
-    private PersonService personService;
-    private final String baseUrl = "/api/persons";
+    private UserService userService;
+    @MockBean
+    private MessageService messageService;
+
+    private final String baseUrl = "/api/users";
     private final String registrationUrl = "/registration";
     private final String jsonId = "$.id";
     private final String jsonUsername = "$.username";
-    private final String jsonPassword = "$.password";
-    private final String jsonPersonRole = "$.personRole";
+    private final String jsonUserRole = "$.userRole";
     private final String jsonStatus = "$.status";
-    private final String methodSourcePath = "com.company.api.controller.PersonControllerTest#";
+    private final String methodSourcePath = "com.company.api.controller.UserControllerTest#";
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    @DisplayName("GET /api/persons возвращает список всех пользователей")
+    @DisplayName("GET /api/users возвращает список всех пользователей")
     void shouldReturnAllPersons_soResponseIs200() {
         PersonDto personDtoUser = getPersonWithRoleUser();
         PersonDto personDtoAdmin = getPersonWithRoleAdmin();
 
         Flux<PersonDto> personDtoFlux = Flux.just(personDtoUser, personDtoAdmin);
 
-        when(personService.findAll()).thenReturn(personDtoFlux);
+        when(userService.findAll()).thenReturn(personDtoFlux);
 
-        Flux<PersonDto> responseBody = this.rest
+        Flux<PersonDto> responseBody = this.webTestClient
                 .get()
                 .uri(baseUrl)
                 .accept(MediaType.APPLICATION_JSON)
@@ -70,21 +74,22 @@ class PersonControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    @DisplayName("POST /api/persons/registration создает нового пользователя")
-    public void shouldCreatePerson_thenReturnSavedPerson_soResponseIs201(){
+    @DisplayName("POST /api/users/registration создает нового пользователя")
+    public void shouldCreateUser_thenReturnSavedUser_soResponseIs201(){
         //given
+        UserDto userDto = getUserWithRoleUser();
         PersonDto personDto = getPersonWithRoleUser();
 
-        when(personService.createPerson(personDto)).thenReturn(Mono.just(personDto));
+        when(userService.createUser(userDto)).thenReturn(Mono.just(personDto));
 
         //then
-        final WebTestClient.ResponseSpec response = this.rest
+        final WebTestClient.ResponseSpec response = this.webTestClient
                 .mutateWith(SecurityMockServerConfigurers.csrf())
                 .post()
                 .uri(baseUrl + registrationUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(getPersonWithRoleUser())
+                .bodyValue(getUserWithRoleUser())
                 .exchange();
 
         response.expectStatus()
@@ -93,23 +98,22 @@ class PersonControllerTest {
                 .expectBody()
                 .consumeWith(System.out::println)
                 .jsonPath(jsonId).isEqualTo(1)
-                .jsonPath(jsonUsername).isEqualTo(personDto.getUsername())
-                .jsonPath(jsonPassword).isEqualTo(personDto.getPassword())
-                .jsonPath(jsonPersonRole).isEqualTo(personDto.getPersonRole().toString());
+                .jsonPath(jsonUsername).isEqualTo(userDto.getUsername())
+                .jsonPath(jsonUserRole).isEqualTo(userDto.getUserRole().toString());
     }
 
     @ParameterizedTest
     @MethodSource(methodSourcePath + "provideInvalidPersonDto")
     @WithMockUser(roles = "ADMIN")
-    @DisplayName("POST /api/persons/registration возвращает код 400 если введены некорректные данные")
-    void shouldNotCreatePerson_becauseRequestValidationFailed_soResponseIs400(PersonDto invalidPersonDto) {
-        final WebTestClient.ResponseSpec response = this.rest
+    @DisplayName("POST /api/users/registration возвращает код 400 если введены некорректные данные")
+    void shouldNotCreateUser_becauseRequestValidationFailed_soResponseIs400(UserDto invalidUserDto) {
+        final WebTestClient.ResponseSpec response = this.webTestClient
                 .mutateWith(SecurityMockServerConfigurers.csrf())
                 .post()
                 .uri(baseUrl + registrationUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(invalidPersonDto)
+                .bodyValue(invalidUserDto)
                 .exchange();
 
         response.expectStatus()
@@ -119,34 +123,32 @@ class PersonControllerTest {
                 .jsonPath(jsonStatus).exists();
     }
 
+    private UserDto getUserWithRoleUser(){
+        return new UserDto(
+                1,
+                "Leo",
+                "password",
+                UserRole.ROLE_USER);
+    }
+
     private PersonDto getPersonWithRoleUser(){
         return new PersonDto(
                 1,
                 "Leo",
-                "password",
-                PersonRole.ROLE_USER,
-                true,
-                true,
-                true,
-                true);
+                UserRole.ROLE_USER);
     }
     private PersonDto getPersonWithRoleAdmin(){
         return new PersonDto(
                 2,
                 "Neo",
-                "password",
-                PersonRole.ROLE_ADMIN,
-                true,
-                true,
-                true,
-                true);
+                UserRole.ROLE_ADMIN);
     }
 
     static Stream<Arguments> provideInvalidPersonDto() {
         return Stream.of(
-                Arguments.of(new PersonDto(1, "", "password", PersonRole.ROLE_USER, true, true, true, true)),
-                Arguments.of(new PersonDto(1, "Leo", "", PersonRole.ROLE_USER, true, true, true, true)),
-                Arguments.of(new PersonDto(2, "Neo", "password", null, true, true, true, true))
+                Arguments.of(new UserDto(1, "", "password", UserRole.ROLE_USER)),
+                Arguments.of(new UserDto(1, "Leo", "", UserRole.ROLE_USER)),
+                Arguments.of(new UserDto(2, "Neo", "password", null))
         );
     }
 }

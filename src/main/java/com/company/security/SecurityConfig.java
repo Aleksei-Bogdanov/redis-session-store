@@ -25,10 +25,9 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .httpBasic().and()
-                .formLogin().and()
                 .authorizeExchange()
-                .pathMatchers("/api/persons/registration").permitAll()
-                .pathMatchers("/api/persons").hasRole("ADMIN")
+                .pathMatchers("/api/users/registration").permitAll()
+                .pathMatchers("/api/users").hasRole("ADMIN")
                 .anyExchange().authenticated()
                 .and()
                 .build();

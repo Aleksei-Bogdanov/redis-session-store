@@ -5,8 +5,6 @@ spring:
     password: password
   flyway:
     url: jdbc:postgresql://localhost:5432/redis-session-store_db
-    user: postgres
-    password: password
     locations: db.migration
   redis:
     host: localhost
