@@ -29,13 +29,13 @@ class UserServiceTest {
 
     @DynamicPropertySource
     public static void overrideProps(DynamicPropertyRegistry registry) {
-        registry.add("spring.flyway.url", POSTGRESQL_CONTAINER::getJdbcUrl);
-        registry.add("spring.flyway.user", POSTGRESQL_CONTAINER::getUsername);
-        registry.add("spring.flyway.password", POSTGRESQL_CONTAINER::getPassword);
-
         registry.add("spring.r2dbc.url", () -> POSTGRESQL_CONTAINER.getJdbcUrl().replace("jdbc", "r2dbc"));
         registry.add("spring.r2dbc.username", POSTGRESQL_CONTAINER::getUsername);
         registry.add("spring.r2dbc.password", POSTGRESQL_CONTAINER::getPassword);
+
+        registry.add("spring.flyway.url", POSTGRESQL_CONTAINER::getJdbcUrl);
+        registry.add("spring.flyway.user", POSTGRESQL_CONTAINER::getUsername);
+        registry.add("spring.flyway.password", POSTGRESQL_CONTAINER::getPassword);
 
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "create");
     }
